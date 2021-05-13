@@ -2,7 +2,7 @@ import dash
 import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Output, Input, State
+from dash.dependencies import Output, Input
 import plotly.express as px
 import pandas as pd
 import numpy as np
@@ -107,12 +107,6 @@ app.layout = html.Div([
         ],
     ),
 
-    dbc.Row([
-        dbc.Col(html.Button('Add Row', id='editing-rows-button', n_clicks=0),
-                width=4, lg={'size': 4, "offset": 0, 'order': 'first'}
-                ),
-        ]),
-
 ])
 
 
@@ -190,17 +184,6 @@ def calculate_total_price(value_metrics):
     else:
         fd = dp.groupby(value_metrics)
         return setup_graph(fd, "line", total_price)
-
-
-@app.callback(
-    Output('mydatatable', 'data'),
-    Input('editing-rows-button', 'n_clicks'),
-    State('mydatatable', 'data'),
-    State('mydatatable', 'columns'))
-def add_row(n_clicks, rows, columns):
-    if n_clicks > 0:
-        rows.append({c[quote_number]: '' for c in columns})
-    return rows
 
 
 # This method creates a chart to represent the data provided
