@@ -28,7 +28,6 @@ vehicle_value = "Vehicle Value"
 df = pd.read_csv('../resources/hastingsdata.csv')
 dp = df  # Create a duplicate of the table to per form operations
 dp[transaction_date] = pd.to_datetime(dp[transaction_date])  # Convert Date column from string format to date
-dp = dp.iloc[1:, :]  # Get rid of the first row as they are column names
 dp[customer_age] = pd.to_numeric(dp[customer_age])  # Convert age column from string to numeric value
 dp[licence_length] = dp[licence_length].apply(np.ceil)  # Apply a round function on Licence Length to get graph
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SOLAR]) # Apply theme
@@ -92,18 +91,22 @@ app.layout = html.Div([
 # This method helps calculate the profit from the different metrics selected.
 def calculate_gross_profit(value_metrics):
     if value_metrics == transaction_date:
+        # Sorts values by transaction date to get metrics by day
         td = dp.sort_values(by=transaction_date)
         fd = td.groupby(value_metrics)
         return setup_graph(fd, "scatter", profit)
     elif value_metrics == "By Week":
+        # Sorts values by week to get metrics
         bw = dp.groupby([test_group, pd.Grouper(key=transaction_date, freq='W')])[profit].sum().reset_index()\
             .sort_values(transaction_date)
         fd = bw.groupby(transaction_date)
         return setup_graph(fd, "scatter", profit)
     elif value_metrics == licence_length:
+        # A groupby on licence length to get graph
         fd = dp.groupby(licence_length)
         return setup_graph(fd, "line", profit)
     else:
+        # This statement is used for age, vehicle value, vehicle mileage
         fd = dp.groupby(value_metrics)
         return setup_graph(fd, "line", profit)
 
